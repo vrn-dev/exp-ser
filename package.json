@@ -1,0 +1,29 @@
+{
+  "name": "ronin-gateops-exit-v001",
+  "version": "0.0.1",
+  "description": "RoninTech Exit Gateops",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "prod": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vrn-dev/ronin-gateops-exit-v001.git"
+  },
+  "author": "Vaisakh Nair",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vrn-dev/ronin-gateops-exit-v001/issues"
+  },
+  "homepage": "https://github.com/vrn-dev/ronin-gateops-exit-v001#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "lodash": "^4.17.4",
+    "morgan": "^1.9.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.14.11"
+  }
+}
