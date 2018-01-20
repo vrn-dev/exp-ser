@@ -54,21 +54,21 @@ ExitGateClose.digitalWrite(1);
 
 ExitLoop.on('interrupt', _.debounce((level) => {
     if ( level === 0 )
-        exitLoopActive.isActive(true);
+        exitLoopActive.isActive = true;
     else if ( level === 1 )
-        exitLoopActive.isActive(false);
+        exitLoopActive.isActive = true;
     if ( !exitLoopActive.isActive && transiting.isTransiting ) {
         ExitGateClose.digitalWrite(0);
         setTimeout(() => ExitGateClose.digitalWrite(1), 100);
-        transiting.isTransiting(false);
+        transiting.isTransiting = false;
     }
 }, 100));
 
 EntryLoop.on('interrupt', _.debounce((level) => {
     if ( level === 0 )
-        entryLoopActive.isActive(true);
+        entryLoopActive.isActive = true;
     else if ( level === 1 )
-        entryLoopActive.isActive(false);
+        entryLoopActive.isActive = true;
 }, 100));
 
 app.use(morgan('dev'));
@@ -94,7 +94,7 @@ app.get('/open-gate', (req, res, next) => {
     if ( entryLoopActive.isActive ) {
         ExitGateOpen.digitalWrite(0);
         setTimeout(() => ExitGateOpen.digitalWrite(1), 100);
-        transiting.isTransiting(true);
+        transiting.isTransiting = true;
         res.status(200).json({ message: 'Gate opened' });
     }
     res.status(403).json({ message: 'No car present on Entry Loop' })
