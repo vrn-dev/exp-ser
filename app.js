@@ -21,8 +21,8 @@ const routes = require('./routes');
 PiGpio.initialize();
 process.on('SIGINT', () => {
     console.log('Received SIGINT.  Press Control-D to exit.');
-    ExitGateClose.digitalWrite(0);
-    setTimeout(() => ExitGateClose.digitalWrite(1), 100);
+    // ExitGateClose.digitalWrite(0);
+    // setTimeout(() => ExitGateClose.digitalWrite(1), 100);
     ExitGateOpen.digitalWrite(1);
     ExitGateClose.digitalWrite(1);
     PiGpio.terminate();
