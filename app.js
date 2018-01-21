@@ -11,6 +11,7 @@ const exitLoopActive = new LoopWatcher();
 const entryLoopActive = new LoopWatcher();
 const Flagger = require('./utils/flagger');
 const transiting = new Flagger();
+const ticket = new Flagger();
 
 const app = express();
 
@@ -20,6 +21,8 @@ const routes = require('./routes');
 PiGpio.initialize();
 process.on('SIGINT', () => {
     console.log('Received SIGINT.  Press Control-D to exit.');
+    ExitGateClose.digitalWrite(0);
+    setTimeout(() => ExitGateClose.digitalWrite(1), 100);
     ExitGateOpen.digitalWrite(1);
     ExitGateClose.digitalWrite(1);
     PiGpio.terminate();
@@ -56,7 +59,10 @@ ExitLoop.on('interrupt', _.debounce((level) => {
     if ( level === 0 )
         exitLoopActive.isActive = true;
     else if ( level === 1 )
-        exitLoopActive.isActive = true;
+        exitLoopActive.isActive = false;
+    if ( ticket.isTicketClosed && entryLoopActive.isActive && exitLoopActive.isActive ) {
+        transiting.isTransiting = true;
+    }
     if ( !exitLoopActive.isActive && transiting.isTransiting ) {
         ExitGateClose.digitalWrite(0);
         setTimeout(() => ExitGateClose.digitalWrite(1), 100);
@@ -68,7 +74,7 @@ EntryLoop.on('interrupt', _.debounce((level) => {
     if ( level === 0 )
         entryLoopActive.isActive = true;
     else if ( level === 1 )
-        entryLoopActive.isActive = true;
+        entryLoopActive.isActive = false;
 }, 100));
 
 app.use(morgan('dev'));
@@ -94,10 +100,11 @@ app.get('/open-gate', (req, res, next) => {
     if ( entryLoopActive.isActive ) {
         ExitGateOpen.digitalWrite(0);
         setTimeout(() => ExitGateOpen.digitalWrite(1), 100);
-        transiting.isTransiting = true;
+        ticket.isTicketClosed = true;
         res.status(200).json({ message: 'Gate opened' });
+    } else {
+        res.status(403).json({ message: 'No car present on Entry Loop' })
     }
-    res.status(403).json({ message: 'No car present on Entry Loop' })
 });
 
 app.get('/status', (req, res) => {

@@ -1,5 +1,6 @@
 const Flagger = function () {
     this._isTransiting = false;
+    this._ticketClosed = false;
 };
 
 Flagger.prototype = {
@@ -8,6 +9,12 @@ Flagger.prototype = {
     },
     get isTransiting() {
         return this._isTransiting;
+    },
+    set isTicketClosed(flag) {
+        this._ticketClosed = flag;
+    },
+    get isTicketClosed() {
+        return this._ticketClosed;
     }
 };
 
