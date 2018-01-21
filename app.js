@@ -56,14 +56,20 @@ ExitGateOpen.digitalWrite(1);
 ExitGateClose.digitalWrite(1);
 
 ExitLoop.on('interrupt', _.debounce((level) => {
-    if ( level === 0 )
+    if ( level === 0 ) {
+        console.log('ExtiLoop Active');
         exitLoopActive.isActive = true;
-    else if ( level === 1 )
+    }
+    else if ( level === 1 ) {
+        console.log('ExitLoop Inactive');
         exitLoopActive.isActive = false;
+    }
     if ( ticket.isTicketClosed && entryLoopActive.isActive && exitLoopActive.isActive ) {
+        console.log('Is Transiting True');
         transiting.isTransiting = true;
     }
     if ( !exitLoopActive.isActive && transiting.isTransiting ) {
+        console.log('Gate Closing');
         ExitGateClose.digitalWrite(0);
         setTimeout(() => ExitGateClose.digitalWrite(1), 100);
         transiting.isTransiting = false;
@@ -71,10 +77,14 @@ ExitLoop.on('interrupt', _.debounce((level) => {
 }, 100));
 
 EntryLoop.on('interrupt', _.debounce((level) => {
-    if ( level === 0 )
+    if ( level === 0 ) {
+        console.log('EntryLoop Active');
         entryLoopActive.isActive = true;
-    else if ( level === 1 )
+    }
+    else if ( level === 1 ) {
+        console.log('Entry Loop Inactive');
         entryLoopActive.isActive = false;
+    }
 }, 100));
 
 app.use(morgan('dev'));
@@ -98,6 +108,8 @@ app.use((req, res, next) => {
 // app.use('/api', routes);
 app.get('/open-gate', (req, res, next) => {
     if ( entryLoopActive.isActive ) {
+        console.log('Gate closing');
+        console.log('TicketIssued true');
         ExitGateOpen.digitalWrite(0);
         setTimeout(() => ExitGateOpen.digitalWrite(1), 100);
         ticket.isTicketClosed = true;
@@ -105,6 +117,32 @@ app.get('/open-gate', (req, res, next) => {
     } else {
         res.status(403).json({ message: 'No car present on Entry Loop' })
     }
+});
+
+app.get('/open-test', (req, res, next) => {
+    ExitGateOpen.digitalWrite(0);
+    setTimeout(() => ExitGateOpen.digitalWrite(1), 100);
+    res.status(200).json({ message: 'Gate opened' });
+    // if ( entryLoopActive.isActive ) {
+    //
+    //     ticket.isTicketClosed = true;
+    //
+    // } else {
+    //     res.status(403).json({ message: 'No car present on Entry Loop' })
+    // }
+});
+
+app.get('/close-test', (req, res, next) => {
+    ExitGateClose.digitalWrite(0);
+    setTimeout(() => ExitGateClose.digitalWrite(1), 100);
+    res.status(200).json({ message: 'Gate closed' });
+    // if ( entryLoopActive.isActive ) {
+    //
+    //     ticket.isTicketClosed = true;
+    //
+    // } else {
+    //     res.status(403).json({ message: 'No car present on Entry Loop' })
+    // }
 });
 
 app.get('/status', (req, res) => {
